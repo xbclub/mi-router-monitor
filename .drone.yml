@@ -1,0 +1,30 @@
+kind: pipeline
+type: kubernetes
+name: default
+platform:
+  os: linux
+  arch: arm64
+steps:
+  - name: build-linux-arm64
+    image: golang:1.22.5-alpine
+    environment:
+      GOOS: linux
+      GOARCH: arm64
+    commands:
+      - go mod tidy
+      - go build -v -o app -ldflags "-s -w" --trimpath
+  - name: build-image
+    image: plugins/docker
+    pull: if-not-exists
+    settings:
+      repo: harbor.nas.neuedu.work/home/mi-router-monitor
+      registry: https://harbor.nas.neuedu.work
+      tag: ${DRONE_BUILD_NUMBER}
+      username:
+        from_secret: DOCKER_USERNAME
+      password:
+        from_secret: DOCKER_PASSWORD
+    depends_on:
+      - build-linux-arm64
+node_selector:
+  kubernetes.io/arch: "arm64"
