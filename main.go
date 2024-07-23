@@ -39,6 +39,8 @@ func main() {
 			status, err := miroutertmp.GetStatus()
 			if err != nil {
 				logx.Error(err)
+				t.Reset(interval)
+				continue
 			}
 			miroutertmp.ComputeUploadSpeed(status)
 			t.Reset(interval)
