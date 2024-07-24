@@ -22,9 +22,9 @@ steps:
       tag:
         - latest-amd64
       username:
-        from_secret: DOCKERHUB_USERNAME
+        from_secret: DOCKER_USERNAME
       password:
-        from_secret: DOCKERHUB_PASSWORD
+        from_secret: DOCKER_PASSWORD
       purge: false
     depends_on:
       - build-linux-amd64
@@ -56,9 +56,9 @@ steps:
       tag:
         - latest-arm64
       username:
-        from_secret: DOCKERHUB_USERNAME
+        from_secret: DOCKER_USERNAME
       password:
-        from_secret: DOCKERHUB_PASSWORD
+        from_secret: DOCKER_PASSWORD
       purge: false
     depends_on:
       - build-linux-arm64
@@ -69,9 +69,9 @@ steps:
     image: plugins/manifest
     settings:
       username:
-        from_secret: DOCKERHUB_USERNAME
+        from_secret: DOCKER_USERNAME
       password:
-        from_secret: DOCKERHUB_PASSWORD
+        from_secret: DOCKER_PASSWORD
       target: xbclub/mi-router-monitor:latest
       template: xbclub/mi-router-monitor:latest-ARCH
       platforms:
