@@ -40,6 +40,8 @@ steps:
       - rm -f app
       - go mod tidy
       - go build -v -o app -ldflags "-s -w" --trimpath
+    depends_on:
+      - build-image-amd64
     when:
       event:
         - tag
