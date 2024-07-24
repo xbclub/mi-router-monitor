@@ -1,30 +1,72 @@
 kind: pipeline
 type: kubernetes
 name: default
-platform:
-  os: linux
-  arch: arm64
 steps:
+  - name: build-linux-amd64
+    image: golang:1.22.5-alpine
+    environment:
+      GOOS: linux
+      GOARCH: amd64
+    commands:
+      - go mod tidy
+      - go build -v -o app -ldflags "-s -w" --trimpath
+  - name: build-image-amd64
+    image: plugins/docker
+    pull: if-not-exists
+    settings:
+      platform: linux/amd64
+      repo: xbclub/mi-router-monitor
+      tag:
+        - latest-amd64
+      username:
+        from_secret: DOCKERHUB_USERNAME
+      password:
+        from_secret: DOCKERHUB_PASSWORD
+      purge: false
+    depends_on:
+      - build-linux-amd64
   - name: build-linux-arm64
     image: golang:1.22.5-alpine
     environment:
       GOOS: linux
       GOARCH: arm64
     commands:
+      - rm -f app
       - go mod tidy
       - go build -v -o app -ldflags "-s -w" --trimpath
-  - name: build-image
+  - name: build-image-arm64
     image: plugins/docker
     pull: if-not-exists
     settings:
-      repo: harbor.nas.neuedu.work/home/mi-router-monitor
-      registry: https://harbor.nas.neuedu.work
-      tag: ${DRONE_BUILD_NUMBER}
+      platform: linux/arm64
+      repo: xbclub/mi-router-monitor
+      environment:
+        - DOCKER_BUILDKIT: 1
+      tag:
+        - latest-arm64
       username:
-        from_secret: DOCKER_USERNAME
+        from_secret: DOCKERHUB_USERNAME
       password:
-        from_secret: DOCKER_PASSWORD
+        from_secret: DOCKERHUB_PASSWORD
+      purge: false
     depends_on:
       - build-linux-arm64
+  - name: mergeimages
+    image: plugins/manifest
+    settings:
+      username:
+        from_secret: DOCKERHUB_USERNAME
+      password:
+        from_secret: DOCKERHUB_PASSWORD
+      target: xbclub/mi-router-monitor:latest
+      template: xbclub/mi-router-monitor:latest-ARCH
+      platforms:
+        - linux/amd64
+        - linux/arm64
+      tags:
+        - ${DRONE_TAG}
+    depends_on:
+      - build-image-amd64
+      - build-image-arm64
 node_selector:
-  kubernetes.io/arch: "arm64"
+  kubernetes.io/arch: "amd64"

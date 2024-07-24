@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    volumes:
+      - ./data/redis/data:/data
+    networks:
+      - mi-router
+  mirouter-ui:
+    image: thun888/mirouter-ui
+    container_name: mirouter-ui
+    volumes:
+      - ./data/mirouter-ui/data:/app/data
+    networks:
+      - mi-router
+  mi-router-monitor:
+    image: xbclub/mi-router-monitor:latest
+    container_name: mi-router-monitor
+    depends_on:
+      - redis
+      - mirouter-ui
+    environment:
+      REDIS_HOST: redis:6379
+      MIROUTER_URL: http://mirouter-ui:6789
+      MONITOR_UPLOAD_SPEED_LIMIT: 3145728
+      MONITOR_DOWNLOAD_SPEED_LIMIT: 31457280
+      MONITOR_ALERT_QUOTA: 600
+      WECHAT_CORPID: <your corpid>
+      WECHAT_CORPSE: <your corpsecret>
+      WECHAT_APPID: <your appid>
+      WECHAT_PROXYSITE: <your proxysite>
+    networks:
+      - mi-router
+networks:
+  mi-router:

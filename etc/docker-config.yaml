@@ -1,0 +1,17 @@
+Redis:
+  Host: ${REDIS_HOST}
+  Type: ${REDIS_TYPE}
+  Pass: ${REDIS_PASS}
+  Tls: ${REDIS_TLS}
+MiRouterURL: ${MIROUTER_URL}
+Wechatconfig:
+  Corpid: ${WECHAT_CORPID}
+  # 企业秘钥
+  Corpsecret: ${WECHAT_CORPSECRET}
+  # 应用id
+  Appid: ${WECHAT_APPID}
+  ProxySite: ${WECHAT_PROXYSITE}
+MonitorConf:
+  UploadSpeedLimit: ${MONITOR_UPLOAD_SPEED_LIMIT}
+  DownloadSpeedLimit: ${MONITOR_DOWNLOAD_SPEED_LIMIT}
+  AlertQuota: ${MONITOR_ALERT_QUOTA}
