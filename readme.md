@@ -2,10 +2,6 @@
 
 本项目基于 [mirouter-ui](https://github.com/Mirouterui/mirouter-ui) 接口构建的上下行网络速率告警
 
-### 使用教程
-
-[点此访问使用教程](https://www.yuque.com/yuqueyonghu3xsgin/igligh/rpr4oslh4nwt2pwv?singleDoc#)
-
 ### 功能列表
 
 - [x] 上行速率告警
