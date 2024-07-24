@@ -11,6 +11,8 @@ services:
   mirouter-ui:
     image: thun888/mirouter-ui
     container_name: mirouter-ui
+    ports:
+      - "6789:6789"
     volumes:
       - ./data/mirouter-ui/data:/app/data
     networks:
@@ -28,7 +30,7 @@ services:
       MONITOR_DOWNLOAD_SPEED_LIMIT: 31457280
       MONITOR_ALERT_QUOTA: 600
       WECHAT_CORPID: <your corpid>
-      WECHAT_CORPSE: <your corpsecret>
+      WECHAT_CORPSECRET: <your corpsecret>
       WECHAT_APPID: <your appid>
       WECHAT_PROXYSITE: <your proxysite>
     networks:
