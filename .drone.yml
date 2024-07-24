@@ -10,6 +10,9 @@ steps:
     commands:
       - go mod tidy
       - go build -v -o app -ldflags "-s -w" --trimpath
+    when:
+      event:
+        - tag
   - name: build-image-amd64
     image: plugins/docker
     pull: if-not-exists
@@ -25,6 +28,9 @@ steps:
       purge: false
     depends_on:
       - build-linux-amd64
+    when:
+      event:
+        - tag
   - name: build-linux-arm64
     image: golang:1.22.5-alpine
     environment:
@@ -34,6 +40,9 @@ steps:
       - rm -f app
       - go mod tidy
       - go build -v -o app -ldflags "-s -w" --trimpath
+    when:
+      event:
+        - tag
   - name: build-image-arm64
     image: plugins/docker
     pull: if-not-exists
@@ -51,6 +60,9 @@ steps:
       purge: false
     depends_on:
       - build-linux-arm64
+    when:
+      event:
+        - tag
   - name: mergeimages
     image: plugins/manifest
     settings:
@@ -68,5 +80,8 @@ steps:
     depends_on:
       - build-image-amd64
       - build-image-arm64
+    when:
+      event:
+        - tag
 node_selector:
   kubernetes.io/arch: "amd64"
