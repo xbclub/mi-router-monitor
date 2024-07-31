@@ -1,4 +1,4 @@
-package mirouter
+package alert
 
 import (
 	"context"
@@ -11,6 +11,7 @@ import (
 	"io"
 	"mirouterMoinitor/svc"
 	"net/http"
+	"strconv"
 )
 
 type MirouterConnect struct {
@@ -27,6 +28,10 @@ var limitkey = "miRouter:limit"
 var UpSpeedOverLimitTemplate = `路由器告警
 当前%s速度大于 %s
 当前速度：%s
+`
+var deviceList = `
+%v. %s 
+%s速度: %v
 `
 
 func NewMirouterConnect(svc *svc.ServiceContext) MirouterConnecter {
@@ -64,8 +69,12 @@ func (m *MirouterConnect) ComputeUploadSpeed(status *MiRouterStatus) {
 		if err != nil {
 			logx.Errorf("Error: %v", err)
 		}
+		var tmpDeviceList = ""
+		for i, x := range sortDevUp(status.Dev) {
+			tmpDeviceList += fmt.Sprintf(deviceList, i+1, x.Devname, "上传", byteConvert(convertint64(x.Upspeed)))
+		}
 		if result == limit.Allowed || result == limit.HitQuota {
-			wxstatus := m.svc.Wechat.Sendmail(fmt.Sprintf(UpSpeedOverLimitTemplate, "上传", byteConvert(m.svc.Config.MonitorConf.UploadSpeedLimit), byteConvert(status.Wan.Upspeed)))
+			wxstatus := m.svc.Wechat.Sendmail(fmt.Sprintf(UpSpeedOverLimitTemplate, "上传", byteConvert(m.svc.Config.MonitorConf.UploadSpeedLimit)+tmpDeviceList, byteConvert(status.Wan.Upspeed)))
 			if wxstatus != true {
 				logx.Error("微信推送失败"+UpSpeedOverLimitTemplate, "上传", byteConvert(m.svc.Config.MonitorConf.UploadSpeedLimit), byteConvert(status.Wan.Upspeed))
 			}
@@ -78,14 +87,60 @@ func (m *MirouterConnect) ComputeUploadSpeed(status *MiRouterStatus) {
 		if err != nil {
 			logx.Errorf("Error: %v", err)
 		}
+		var tmpDeviceList = ""
+		for i, x := range sortDevDown(status.Dev) {
+			tmpDeviceList += fmt.Sprintf(deviceList, i+1, x.Devname, "下载", byteConvert(convertint64(x.Upspeed)))
+		}
 		if result == limit.Allowed || result == limit.HitQuota {
-			wxstatus := m.svc.Wechat.Sendmail(fmt.Sprintf(UpSpeedOverLimitTemplate, "下载", byteConvert(m.svc.Config.MonitorConf.DownloadSpeedLimit), byteConvert(status.Wan.Downspeed)))
+			wxstatus := m.svc.Wechat.Sendmail(fmt.Sprintf(UpSpeedOverLimitTemplate, "下载", byteConvert(m.svc.Config.MonitorConf.DownloadSpeedLimit)+tmpDeviceList, byteConvert(status.Wan.Downspeed)))
 			if wxstatus != true {
 				logx.Error("微信推送失败"+UpSpeedOverLimitTemplate, "下载", byteConvert(m.svc.Config.MonitorConf.DownloadSpeedLimit), byteConvert(status.Wan.Downspeed))
 			}
 		} else {
 			logx.Info("下载告警指定时间段内已推送过，跳过")
 		}
+	}
+
+}
+
+// 对 status.dev Upspeed字段进行排序
+func sortDevUp(dev []Dev) []Dev {
+	for i := 0; i < len(dev); i++ {
+		for j := i + 1; j < len(dev); j++ {
+			if convertint64(dev[i].Upspeed) < convertint64(dev[j].Upspeed) {
+				dev[i], dev[j] = dev[j], dev[i]
+			}
+		}
+	}
+	return dev
+}
+
+// 对 status.dev Downspeed字段进行排序
+func sortDevDown(dev []Dev) []Dev {
+	for i := 0; i < len(dev); i++ {
+		for j := i + 1; j < len(dev); j++ {
+			if convertint64(dev[i].Downspeed) < convertint64(dev[j].Downspeed) {
+				dev[i], dev[j] = dev[j], dev[i]
+			}
+		}
+	}
+	return dev
+}
+func convertint64(s interface{}) int64 {
+	switch s.(type) {
+	case string:
+		parseInt, err := strconv.ParseInt(s.(string), 10, 64)
+		if err != nil {
+			logx.Error(err)
+			return 0
+		}
+		return parseInt
+	case int:
+		return int64(s.(int))
+	case int64:
+		return s.(int64)
+	default:
+		return 0
 	}
 }
 

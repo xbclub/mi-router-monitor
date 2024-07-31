@@ -6,7 +6,7 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 	"mirouterMoinitor/config"
 	"mirouterMoinitor/svc"
-	"mirouterMoinitor/utiles/mirouter"
+	"mirouterMoinitor/utiles/alert"
 	"os"
 	"os/signal"
 	"syscall"
@@ -35,7 +35,7 @@ func main() {
 			running = false
 			logx.Info("接收到程序退出信号，程序退出")
 		case <-t.C:
-			miroutertmp := mirouter.NewMirouterConnect(ctx)
+			miroutertmp := alert.NewMirouterConnect(ctx)
 			status, err := miroutertmp.GetStatus()
 			if err != nil {
 				logx.Error(err)

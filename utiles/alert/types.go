@@ -1,4 +1,4 @@
-package mirouter
+package alert
 
 type MiRouterStatus struct {
 	Code  int `json:"code"`
@@ -13,19 +13,7 @@ type MiRouterStatus struct {
 		Hz   string `json:"hz"`
 		Load int    `json:"load"`
 	} `json:"cpu"`
-	Dev []struct {
-		Devname          string      `json:"devname"`
-		Download         interface{} `json:"download"`
-		Downspeed        interface{} `json:"downspeed"`
-		Isap             int         `json:"isap,omitempty"`
-		Mac              string      `json:"mac"`
-		Maxdownloadspeed string      `json:"maxdownloadspeed"`
-		Maxuploadspeed   string      `json:"maxuploadspeed"`
-		Online           string      `json:"online"`
-		Upload           interface{} `json:"upload"`
-		Upspeed          interface{} `json:"upspeed"`
-		Ip               string      `json:"ip,omitempty"`
-	} `json:"dev"`
+	Dev      []Dev `json:"dev"`
 	Hardware struct {
 		DisplayRomVer string `json:"DisplayRomVer"`
 		Channel       string `json:"channel"`
@@ -53,4 +41,17 @@ type MiRouterStatus struct {
 		Upload           int64  `json:"upload,string"`
 		Upspeed          int64  `json:"upspeed,string"`
 	} `json:"wan"`
+}
+type Dev struct {
+	Devname          string      `json:"devname"`
+	Download         interface{} `json:"download"`
+	Downspeed        interface{} `json:"downspeed"`
+	Isap             int         `json:"isap,omitempty"`
+	Mac              string      `json:"mac"`
+	Maxdownloadspeed string      `json:"maxdownloadspeed"`
+	Maxuploadspeed   string      `json:"maxuploadspeed"`
+	Online           string      `json:"online"`
+	Upload           interface{} `json:"upload"`
+	Upspeed          interface{} `json:"upspeed"`
+	Ip               string      `json:"ip,omitempty"`
 }
