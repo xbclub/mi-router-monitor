@@ -89,7 +89,7 @@ func (m *MirouterConnect) ComputeUploadSpeed(status *MiRouterStatus) {
 		}
 		var tmpDeviceList = ""
 		for i, x := range sortDevDown(status.Dev) {
-			tmpDeviceList += fmt.Sprintf(deviceList, i+1, x.Devname, "下载", byteConvert(convertint64(x.Upspeed)))
+			tmpDeviceList += fmt.Sprintf(deviceList, i+1, x.Devname, "下载", byteConvert(convertint64(x.Downspeed)))
 		}
 		if result == limit.Allowed || result == limit.HitQuota {
 			wxstatus := m.svc.Wechat.Sendmail(fmt.Sprintf(UpSpeedOverLimitTemplate, "下载", byteConvert(m.svc.Config.MonitorConf.DownloadSpeedLimit)+tmpDeviceList, byteConvert(status.Wan.Downspeed)))
